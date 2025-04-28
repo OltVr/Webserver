@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hourly-wiki-todo
+  namespace: webserver-namespace
+spec:
+  schedule: "0 * * * *"  # Every hour
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: wiki-todo
+            image: curlimages/curl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              URL=$(curl -s -o /dev/null -w "%{redirect_url}" https://en.wikipedia.org/wiki/Special:Random)
+              echo "Selected Wikipedia URL: $URL"
+              curl -X POST http://webserver-svc:2346/todos \
+                -H "Content-Type: application/json" \
+                -d "{\"todo\": \"Read $URL\"}"
+          restartPolicy: OnFailure

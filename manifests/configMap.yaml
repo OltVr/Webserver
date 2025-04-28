@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webserver-config
+  namespace: webserver-namespace
+data:
+  DB_HOST: "postgres-svc.webserver-namespace.svc.cluster.local"
+  DB_PORT: "5432"

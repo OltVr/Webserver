@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webserver-staging
+  namespace: argocd
+spec:
+  destination:
+    namespace: webserver-staging
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://github.com/OltVr/Webserver.git
+    path: manifests   
+    targetRevision: main   
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webserver-production
+  namespace: argocd
+spec:
+  destination:
+    namespace: webserver-production
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://github.com/OltVr/Webserver.git
+    path: manifests   
+    targetRevision: main   
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

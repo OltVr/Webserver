@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: webserver-namespace
+  name: webserver-ing
+  labels:
+    name: webserver
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: webserver-svc
+            port: 
+              number: 2345
+      - pathType: Prefix
+        path: "/todos"
+        backend:
+          service:
+            name: backend-svc
+            port: 
+              number: 2346

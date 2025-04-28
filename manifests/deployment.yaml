@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: webserver-namespace
+  name: webserver-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webserver
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      volumes:
+        - name: shared-img
+          persistentVolumeClaim:
+            claimName: webserver-pvc
+      containers:
+      - name: webserver
+        image: oltvr/kuber
+        volumeMounts:
+        - name: shared-img
+          mountPath: /usr/src/app/static  # Ensure this matches the Flask static folder path
+        env:
+        - name: PORT
+          value: "5000"
+        - name: TODO_API_URL
+          value: "http://backend-svc:2346/todos"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: webserver-namespace
+  name: backend-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: oltvr/todo-backend
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: webserver-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: webserver-config
+              key: DB_PORT
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: webserver-secret
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: webserver-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: webserver-secret
+              key: POSTGRES_PASSWORD
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 3
+
+---
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: webserver-namespace
+  name: broadcaster-dep
+spec:
+  replicas: 6  # You asked for 6 replicas
+  selector:
+    matchLabels:
+      app: broadcaster
+  template:
+    metadata:
+      labels:
+        app: broadcaster
+    spec:
+      containers:
+      - name: broadcaster
+        image: oltvr/broadcaster  # (you will build/push this broadcaster image)
+        env:
+        - name: NATS_URL
+          value: "nats://my-nats:4222"
+        - name: DISCORD_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: webserver-secret
+              key: DISCORD_WEBHOOK_URL
+        - name: NATS_QUEUE
+          value: "broadcaster"

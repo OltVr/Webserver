@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Kubes To Do's</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f4f8;
+        }
+        .container {
+            margin-top: 30%;
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+        h1 {
+            color: #3498db;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #555;
+            font-size: 1.2rem;
+        }
+        img {
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .todo-input {
+            margin-top: 30px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+            text-align: left;
+        }
+        li {
+            background-color: #ecf0f1;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .char-limit {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kubes To Do's</h1>
+        <p>Your To Do list application is running smoothly!</p>
+        <img src="{{ url_for('static', filename=image_filename) }}" alt="Random Image">
+
+        <div class="todo-input">
+            <form method="post">
+                <input type="text" id="todoInput" name="todo" maxlength="140" placeholder="Enter a new todo (max 140 characters)">
+                <button id="sendBtn">Add Todo</button>
+            </form>
+            <div class="char-limit">Max 140 characters</div>
+        </div>
+
+        <ul>
+            {% for todo in todos %}
+                <li>
+                    <span {% if todo.done %}style="text-decoration: line-through; color: grey;"{% endif %}>{{ todo.content }}</span>
+                    {% if not todo.done %}
+                    <form method="post" style="margin: 0;">
+                        <input type="hidden" name="done_id" value="{{ todo.id }}">
+                        <button>Done</button>
+                    </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
