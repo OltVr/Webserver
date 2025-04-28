@@ -8,7 +8,7 @@ spec:
     namespace: webserver-staging
     server: https://kubernetes.default.svc
   source:
-    repoURL: https://github.com/OltVr/Webserver.git
+    repoURL: https://github.com/OltVr/Webserver
     path: manifests   
     targetRevision: main   
   project: default
@@ -31,7 +31,7 @@ spec:
     namespace: webserver-production
     server: https://kubernetes.default.svc
   source:
-    repoURL: https://github.com/OltVr/Webserver.git
+    repoURL: https://github.com/OltVr/Webserver
     path: manifests   
     targetRevision: main   
   project: default
